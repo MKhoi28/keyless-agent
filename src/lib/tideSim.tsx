@@ -42,12 +42,14 @@ function useSimState() {
     setInit(false);
   }, []);
 
-  const login = useCallback(() => {
-    const name = window.prompt("Simulated Tide sign-in\n\nUsername:", "dr.alice")?.trim();
-    if (!name) return;
+  const [signingIn, setSigningIn] = useState(false);
+  const login = useCallback(() => setSigningIn(true), []);
+
+  const signIn = useCallback((name: string) => {
     const u: SimUser = { sub: `sim-${name}`, preferred_username: name, realm_access: { roles: ROLES } };
     sessionStorage.setItem("sim-tide-user", JSON.stringify(u));
     setUser(u);
+    setSigningIn(false);
   }, []);
 
   const logout = useCallback(() => {
@@ -95,6 +97,9 @@ function useSimState() {
     });
 
   return {
+    signingIn,
+    signIn,
+    cancelSignIn: () => setSigningIn(false),
     authenticated: !!user,
     isInitializing,
     login,
@@ -113,12 +118,39 @@ export function SimTideProvider({ children }: { children: React.ReactNode }) {
   const value = useSimState();
   return (
     <Ctx.Provider value={value}>
-      <div style={{ background: "#78350f", color: "#fde68a", padding: "0.5rem 1rem", margin: "-2rem -2rem 1.5rem", fontSize: "0.85rem" }}>
-        Simulated TideCloak (Plan C): Tide&apos;s network was under heavy load, so sign-in, roles and encryption are
-        simulated in this browser. The server and the AI still only ever see ciphertext.
+      <div className="sim-banner">
+        ⚠ Simulated TideCloak (Plan C): Tide&apos;s network was under heavy load, so sign-in, roles and encryption
+        are simulated in this browser. The server and the AI still only ever see ciphertext.
       </div>
       {children}
+      {value.signingIn && <SignInDialog onSubmit={value.signIn} onCancel={value.cancelSignIn} />}
     </Ctx.Provider>
+  );
+}
+
+function SignInDialog({ onSubmit, onCancel }: { onSubmit: (name: string) => void; onCancel: () => void }) {
+  const [name, setName] = useState("dr.alice");
+  return (
+    <div className="overlay" onClick={onCancel}>
+      <form
+        className="dialog"
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (name.trim()) onSubmit(name.trim());
+        }}
+      >
+        <div className="tide-mark">🔐 Secured by Tide · simulated</div>
+        <h2>Sign in</h2>
+        <p>Your key never leaves your browser. No server, admin or AI can sign in as you.</p>
+        <label htmlFor="sim-username">Username</label>
+        <input id="sim-username" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+        <div className="dialog-actions">
+          <button type="button" className="btn btn-ghost" onClick={onCancel}>Cancel</button>
+          <button type="submit" className="btn">Continue</button>
+        </div>
+      </form>
+    </div>
   );
 }
 

@@ -3,51 +3,60 @@
 import { useTide } from "@/lib/tide";
 
 export default function HomePage() {
-  const { authenticated, getValueFromIdToken, login, logout, isInitializing } =
-    useTide();
+  const { authenticated, getValueFromIdToken, login, logout, isInitializing } = useTide();
 
-  if (isInitializing) {
-    return <p>Loading...</p>;
-  }
-
-  if (!authenticated) {
-    return (
-      <div style={{ maxWidth: 480, margin: "4rem auto", textAlign: "center" }}>
-        <h1>Keyless Agent</h1>
-        <p style={{ color: "#999", marginBottom: "2rem" }}>
-          A clinic AI assistant that can never take patient data out on its own.
-        </p>
-        <button onClick={login} style={btnStyle}>
-          Login with Tide
-        </button>
-      </div>
-    );
-  }
+  if (isInitializing) return <div className="container muted">Loading…</div>;
 
   return (
-    <div style={{ maxWidth: 480, margin: "4rem auto", textAlign: "center" }}>
-      <h1>Keyless Agent</h1>
-      <p>Welcome, {getValueFromIdToken("preferred_username")}</p>
-      <nav style={{ display: "flex", gap: "1rem", justifyContent: "center", marginTop: "1rem" }}>
-        <a href="/agent" style={btnStyle}>
-          Open assistant
-        </a>
-        <button onClick={logout} style={{ ...btnStyle, background: "#333" }}>
-          Logout
-        </button>
-      </nav>
+    <div className="container">
+      <div className="topbar">
+        <div className="brand">
+          <span className="brand-mark">🔐</span> Keyless Agent
+        </div>
+        {authenticated && (
+          <div className="topbar-actions">
+            <span className="user-chip">
+              <span className="avatar">{String(getValueFromIdToken("preferred_username") ?? "?")[0].toUpperCase()}</span>
+              {getValueFromIdToken("preferred_username")}
+            </span>
+            <button onClick={logout} className="btn btn-ghost btn-sm">Log out</button>
+          </div>
+        )}
+      </div>
+
+      <section className="hero">
+        <span className="hero-eyebrow">🩺 Clinic AI assistant · built with TideCloak</span>
+        <h1>
+          An AI that can read patient records, <span className="gradient-text">but never take them.</span>
+        </h1>
+        <p className="lead">
+          Keyless Agent summarises records and drafts referrals. Even if a hidden prompt injection hijacks it, the data it
+          leaks is unreadable, because no AI, server or admin ever holds the key.
+        </p>
+        {authenticated ? (
+          <a href="/agent" className="btn btn-lg">Open assistant →</a>
+        ) : (
+          <button onClick={login} className="btn btn-lg">Log in with Tide</button>
+        )}
+
+        <div className="features">
+          <div className="card feature">
+            <div className="feature-icon">🔒</div>
+            <h3>Encrypted in your browser</h3>
+            <p>Records are stored only as ciphertext. The server never sees a patient&apos;s name or diagnosis.</p>
+          </div>
+          <div className="card feature">
+            <div className="feature-icon">🤖</div>
+            <h3>AI with no master key</h3>
+            <p>The assistant works on what you choose to share. It can&apos;t decrypt anything on its own.</p>
+          </div>
+          <div className="card feature">
+            <div className="feature-icon">✅</div>
+            <h3>You approve every export</h3>
+            <p>Sending a record needs your own Tide login, so a hijacked AI can&apos;t do it for you.</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  background: "#2563eb",
-  color: "#fff",
-  border: "none",
-  borderRadius: 6,
-  padding: "0.75rem 1.5rem",
-  fontSize: "1rem",
-  cursor: "pointer",
-  textDecoration: "none",
-  display: "inline-block",
-};
