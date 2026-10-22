@@ -25,14 +25,19 @@ export default function HomePage() {
       </div>
 
       <section className="hero">
-        <span className="hero-eyebrow">🩺 Clinic AI assistant · built with TideCloak</span>
+        <span className="hero-eyebrow">◆ Clinic AI assistant · built with TideCloak</span>
         <h1>
-          An AI that can read patient records, <span className="gradient-text">but never take them.</span>
+          The AI that reads patient records but can <span className="underline">never</span> leak them
         </h1>
         <p className="lead">
           Keyless Agent summarises records and drafts referrals. Even if a hidden prompt injection hijacks it, the data it
           leaks is unreadable, because no AI, server or admin ever holds the key.
         </p>
+        <div className="chips">
+          <span className="chip">0 keys on the server</span>
+          <span className="chip">Encrypted in-browser</span>
+          <span className="chip">You approve every export</span>
+        </div>
         {authenticated ? (
           <a href="/agent" className="btn btn-lg">Open assistant →</a>
         ) : (

@@ -236,10 +236,10 @@ export default function AgentPage() {
         </div>
 
         <div className="stack">
-          <section className="card">
+          <section className="card terminal">
             <div className="card-head">
-              <h2 className="card-title"><span className="step-num">AI</span>Agent activity</h2>
-              <span className="badge badge-lock">no keys on the server</span>
+              <h2 className="card-title"><span className="live-dot" />AI agent · live log</h2>
+              <span className="badge badge-good">no keys on the server</span>
             </div>
             {steps.length === 0 ? (
               <div className="empty">The agent&apos;s reasoning and tool calls will appear here.</div>
